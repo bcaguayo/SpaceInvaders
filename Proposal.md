@@ -1,6 +1,6 @@
 ## Space Invaders - C++ Version
 
-Access a Google Docs version (Comments enabled) at [https://docs.google.com/document/d/1R6uULiXXGkH1TrzBgwIEWcCZ287Bl2iQCnSwkI-BRkA/edit?usp=sharing](url)
+Access a Google Docs version (Comments enabled) [here]([url](https://docs.google.com/document/d/1R6uULiXXGkH1TrzBgwIEWcCZ287Bl2iQCnSwkI-BRkA/edit?usp=sharing))
 
 **Date:** March 30, 2024
 
