@@ -5,4 +5,5 @@ clean:
 	rm -f menu.o menu
 
 menu: menu.cpp
-	g++ -std=c++11 menu.cpp -o menu $(CXXFLAGS)
+	g++ -c menu.cpp
+	g++ menu.o -o menu $(CXXFLAGS)
