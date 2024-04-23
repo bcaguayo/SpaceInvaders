@@ -26,9 +26,8 @@ int main() {
     // window.setFramerateLimit(60);
     
     // Game Update
-    while (window.isOpen())
-    {
-       game::update(window);
+    while (window.isOpen()) {
+        game::menu(window);
     }
 
     return 0;
