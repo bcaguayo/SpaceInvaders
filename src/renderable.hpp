@@ -1,24 +1,37 @@
 #include <SFML/Graphics.hpp>
+#include <string>
 
-class Renderable {
+class renderable {
 public:
-    virtual ~Renderable() = default;
+    void loadTexture(int scale) {
+        if (!texture.loadFromFile(getTexturePath())) {
+            std::cerr << "Error loading player texture" << std::endl;
+        }
 
-    void setPosition(float x, float y) {
-        sprite.setPosition(x, y);
+        sprite.setTexture(texture);
+        sprite.setPosition(112 * scale, 200 * scale);
+        sprite.setScale(scale, scale);
     }
 
-    void setScale(float x, float y) {
-        sprite.setScale(x, y);
+    float getPositionX() {
+        return sprite.getPosition().x;
     }
+
+    float getPositionY() {
+        return sprite.getPosition().y;
+    }
+
+    void move(float x, float y) {
+        sprite.move(x, y);
+    }
+
 
     void render(sf::RenderWindow& window) {
         window.draw(sprite);
     }
 
 protected:
+    virtual std::string getTexturePath() const = 0;
     sf::Texture texture;
-    sf::Sprite sprite;
-    
-    virtual void loadTexture() = 0;
+    sf::Sprite sprite;   
 };
