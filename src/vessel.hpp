@@ -7,6 +7,7 @@ public:
     Vessel(int x, int y, int speedX, int speedY, int firingSpeed, bool firepower, int cooldown)
         : x_(x), y_(y), speedX_(speedX), speedY_(speedY), 
         firepower_(firepower), firingSpeed_(firingSpeed), cooldown_(cooldown) {}
+    
     // Default constructor
     Vessel() : x_(112), y_(200), speedX_(0), speedY_(0), firepower_(false), firingSpeed_(1), cooldown_(1) {}
 

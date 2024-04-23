@@ -3,10 +3,10 @@
 
 #include <SFML/Graphics.hpp>
 
-class Game {
+class game {
 public:
-    void start(sf::RenderWindow& window);
-    void update(sf::RenderWindow& window);
+    static void start(sf::RenderWindow& window, float scale);
+    static void update(sf::RenderWindow& window);
 
 private:
     private:

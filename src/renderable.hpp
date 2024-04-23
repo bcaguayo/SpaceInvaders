@@ -2,22 +2,23 @@
 
 class Renderable {
 public:
-    Renderable(const std::string& texturePath) {
-        if (!texture.loadFromFile(texturePath)) {
-            std::cerr << "Failed to load texture: " << texturePath << std::endl;
-        }
-        sprite.setTexture(texture);
-    }
+    virtual ~Renderable() = default;
 
     void setPosition(float x, float y) {
         sprite.setPosition(x, y);
+    }
+
+    void setScale(float x, float y) {
+        sprite.setScale(x, y);
     }
 
     void render(sf::RenderWindow& window) {
         window.draw(sprite);
     }
 
-private:
+protected:
     sf::Texture texture;
     sf::Sprite sprite;
+    
+    virtual void loadTexture() = 0;
 };
