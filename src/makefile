@@ -4,15 +4,11 @@ CXXFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 clean:
 	rm -f menu.o menu game.o game
 
-# menu: menu.cpp
-# 	g++ -c menu.cpp
-# 	g++ menu.o -o menu $(CXXFLAGS)
-
-# game: game.hpp game.cpp
-# 	g++ -c game.cpp
-# 	g++ game.o -o game $(CXXFLAGS)
-
-game: game.hpp game.cpp menu.cpp
-	g++ -c game.cpp
-	g++ -c menu.cpp
+game: game.o menu.o
 	g++ game.o menu.o -o game $(CXXFLAGS)
+
+menu.o: menu.cpp
+	g++ -c menu.cpp $(CXXFLAGS)
+
+game.o: game.hpp game.cpp
+	g++ -c game.cpp $(CXXFLAGS)

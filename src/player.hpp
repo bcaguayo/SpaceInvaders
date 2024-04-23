@@ -1,20 +1,45 @@
-#ifndef PLAYER_HPP
-#define PLAYER_HPP
+#include <SFML/Graphics.hpp>
+#include <iostream>
 
-#include <string>
-#include "renderable.hpp"
-
-class player : public renderable {
-private:
-    std::string texturePath;
-
+class player {
 public:
-    player() : texturePath("assets/laser.png") {}
 
-    void render() override {
-        // Implement the rendering logic for the player here
-        // using the texturePath variable
+    player() {
+        texture = sf::Texture();
+        sprite = sf::Sprite();
     }
-};
 
-#endif // PLAYER_HPP
+    void loadTexture(int scale) {
+        if (!texture.loadFromFile("assets/laser.png")) {
+            std::cerr << "Error loading player texture" << std::endl;
+        }
+
+        sprite.setTexture(texture);
+        sprite.setPosition(112 * scale, 200 * scale);
+        sprite.setScale(scale, scale);
+    }
+
+    sf::Sprite getSprite() {
+        return sprite;
+    }
+
+    float getPositionX() {
+        return sprite.getPosition().x;
+    }
+
+    float getPositionY() {
+        return sprite.getPosition().y;
+    }
+
+    void move(float x, float y) {
+        sprite.move(x, y);
+    }
+
+    void render (sf::RenderWindow& window) {
+        window.draw(sprite);
+    }
+
+private:
+    sf::Texture texture;
+    sf::Sprite sprite;
+};
