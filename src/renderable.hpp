@@ -4,7 +4,7 @@ class Renderable {
 public:
     Renderable(const std::string& texturePath) {
         if (!texture.loadFromFile(texturePath)) {
-            // Handle error if texture loading fails
+            std::cerr << "Failed to load texture: " << texturePath << std::endl;
         }
         sprite.setTexture(texture);
     }

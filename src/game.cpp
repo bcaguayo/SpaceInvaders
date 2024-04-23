@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include "game.hpp"
 
 void start(sf::RenderWindow& window) {
     window.setFramerateLimit(60);

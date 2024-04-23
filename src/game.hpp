@@ -5,7 +5,7 @@
 
 class Game {
 public:
-    void start(sf::RenderWindow& window) { window.setFramerateLimit(60); }
+    void start(sf::RenderWindow& window);
     void update(sf::RenderWindow& window);
 
 private:
