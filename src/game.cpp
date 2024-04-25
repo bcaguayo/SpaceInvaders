@@ -26,6 +26,7 @@ std::vector<missile> missiles;
 // 3 sprites, rendering depends on index on vector
 std::vector<std::unique_ptr<alien>> aliens;
 std::vector<bool> alive;
+int numAliens;
 bool direction = true;
 int tick = 0;
 
@@ -58,9 +59,9 @@ void game::start(sf::RenderWindow& window, float scale) {
         aliens.push_back(std::move(a));
         alive.push_back(true);
     }
+    numAliens = 55;
 }
 
-std::string lostString = "GAME OVER";
 void game::update(sf::RenderWindow& window) {
     tick++;
     tick %= 60;
@@ -73,7 +74,20 @@ void game::update(sf::RenderWindow& window) {
             std::cerr << "Error loading font" << std::endl;
         }
         sf::Text endText;      
-        game::text(endText, lostString, font, sf::Color::Red, true, 50, 50.f, 220.f, SCREEN_SCALE);
+        game::text(endText, "GAME OVER", font, sf::Color::Red, true, 50, 50.f, 220.f, SCREEN_SCALE);
+        window.draw(endText);
+        window.display();
+        
+        pauseForSeconds(2);
+    } else if (numAliens <= 0) {
+        running = false;
+        // Display Win text at bottom of screen
+        sf::Font font;
+        if (!font.loadFromFile("assets/Code7X5.ttf")) {
+            std::cerr << "Error loading font" << std::endl;
+        }
+        sf::Text endText;      
+        game::text(endText, "YOU WIN! :D", font, sf::Color::Cyan, true, 50, 50.f, 220.f, SCREEN_SCALE);
         window.draw(endText);
         window.display();
         
@@ -139,6 +153,17 @@ void game::update(sf::RenderWindow& window) {
         m.color(sf::Color::White);
         m.moveto(randomAlien.getPositionX(), randomAlien.getPositionY());
         alienMissiles.push_back(m);
+    }
+
+    // Alien Collision
+    for (int i = 0; i < missiles.size(); i++) {
+        sf::FloatRect missileBounds = missiles[i].getBounds();
+        for (const auto& aPtr : aliens) {
+            auto& a = *aPtr;
+            if (missileBounds.intersects(a.getBounds())) {
+                missiles.erase(missiles.begin() + i);
+            }            
+        }
     }
     
     // ________________________ 4. Player
