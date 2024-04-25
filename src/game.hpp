@@ -7,7 +7,7 @@ class game {
 public:
     static void start(sf::RenderWindow& window, float scale);
     static void update(sf::RenderWindow& window);
-    static void menu(sf::RenderWindow& window);
+    static void menu(sf::RenderWindow& window, float scale);
     static void draw(sf::RenderWindow& window);
 };
 

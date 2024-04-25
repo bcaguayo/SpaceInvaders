@@ -6,13 +6,6 @@
 
 float SCREEN_SCALE_ = 3.f;
 
-// wip
-struct Aliens {
-    // alien object
-    // vector of bools, true if alive, false if dead
-    // 3 sprites, rendering depends on index on vector
-};
-
 int main() {
 
     // sf::RenderWindow window(sf::VideoMode(800, 600), "Space Invaders");
@@ -22,11 +15,12 @@ int main() {
 
     // Game Start
     sf::RenderWindow window(sf::VideoMode(224.f * SCREEN_SCALE_, 256.f * SCREEN_SCALE_), "Space Invaders");
-    game::start(window, SCREEN_SCALE_);
+    window.setFramerateLimit(60);
+    window.setPosition(sf::Vector2i(200 * SCREEN_SCALE_, 50 * SCREEN_SCALE_));
     
     // Game Update
     while (window.isOpen()) {
-        game::menu(window);
+        game::menu(window, SCREEN_SCALE_);
     }
 
     return 0;

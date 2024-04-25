@@ -24,10 +24,6 @@ public:
         right ? sprite.move(localSpeed, 0.f) : sprite.move(-localSpeed, 0.f);
     }
 
-    float getCooldown() {
-        return 0.5f;
-    }
-
 protected:
     std::string getTexturePath() const override {
         return "assets/laser.png";

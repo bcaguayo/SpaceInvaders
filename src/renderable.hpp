@@ -16,8 +16,6 @@ public:
         }
 
         sprite.setTexture(texture);
-        // sprite.setPosition(112 * SCREEN_SCALE, 200 * SCREEN_SCALE);
-        // sprite.setScale(SCREEN_SCALE, SCREEN_SCALE);
     }
 
     virtual void setRScale() = 0;
@@ -28,6 +26,10 @@ public:
 
     float getPositionY() {
         return sprite.getPosition().y;
+    }
+
+    void setPosition(float x, float y) {
+        sprite.setPosition(x, y);
     }
 
     virtual void move(bool right) = 0;
@@ -46,7 +48,7 @@ public:
         window.draw(sprite);
     }
 
-protected:
+public:
     virtual std::string getTexturePath() const = 0;
     sf::Texture texture;
     sf::Sprite sprite;
