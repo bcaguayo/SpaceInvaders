@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <cstdlib> // rand() and srand()
 #include <ctime>   // time()
+#include <thread> // std::this_thread::sleep_for
+#include <chrono> // std::chrono::seconds
 #include <iostream>
 #include "game.hpp"
 #include "player.hpp"
@@ -9,7 +11,11 @@
 
 /* ________________________ Local Vars ________________________ */
 float SCREEN_SCALE;
+bool running = true;
+
+/* ________________________ Game Vars ________________________ */
 player p;
+int lives;
 int cooldown;
 std::vector<missile> missiles;
 
@@ -38,6 +44,7 @@ void game::start(sf::RenderWindow& window, float scale) {
     p = player(SCREEN_SCALE);
     p.loadTexture();
     p.setRScale();
+    lives = 3;
     
     // Aliens
     aliens.clear();
@@ -53,9 +60,25 @@ void game::start(sf::RenderWindow& window, float scale) {
     }
 }
 
+std::string lostString = "GAME OVER";
 void game::update(sf::RenderWindow& window) {
     tick++;
     tick %= 60;
+
+    if (lives <= 0) {
+        running = false;
+        // Display Game Over text at bottom of screen  
+        sf::Font font;
+        if (!font.loadFromFile("assets/Code7X5.ttf")) {
+            std::cerr << "Error loading font" << std::endl;
+        }
+        sf::Text endText;      
+        game::text(endText, lostString, font, sf::Color::Red, true, 50, 50.f, 220.f, SCREEN_SCALE);
+        window.draw(endText);
+        window.display();
+        
+        pauseForSeconds(2);
+    }
     
     // ________________________ 1. Poll
     sf::Event event;
@@ -127,6 +150,7 @@ void game::update(sf::RenderWindow& window) {
         p.move(true);
     }
 
+    // Player Missiles
     if (cooldown > 0) {
         cooldown--;
 
@@ -140,10 +164,20 @@ void game::update(sf::RenderWindow& window) {
         cooldown = 15;
     }
 
+    // Player Collision
+    sf::FloatRect playerBounds = p.getBounds();
+    for (int i = 0; i < alienMissiles.size(); i++) {
+        if (playerBounds.intersects(alienMissiles[i].getBounds())) {
+            alienMissiles.erase(alienMissiles.begin() + i);
+            lives--;
+        }
+    }
+
     // 5. Draw
     game::draw(window);
 }
 
+// Render all the things
 void game::draw(sf::RenderWindow& window) {
     window.clear();
     p.render(window);
@@ -168,9 +202,8 @@ Press Enter to play
 Press Q to quit the game
 Optional: Press L for leaderboards
 */
-
 std::string textString = "SPACE INVADERS\nPress Enter to play\nPress Q to quit the game";
-
+std::string enemyString = "= 10 points\n\n\n\n= 20 points\n\n\n\n= 30 points";
 void game::menu(sf::RenderWindow& window, float SCREEN_SCALE_) {
     sf::Font font;
     if (!font.loadFromFile("assets/Code7X5.ttf")) {
@@ -179,12 +212,10 @@ void game::menu(sf::RenderWindow& window, float SCREEN_SCALE_) {
 
     // Set font
     sf::Text menuText;
-    menuText.setFont(font);
-    menuText.setString(textString);
-    menuText.setCharacterSize(20); // in pixels, not points!
-    menuText.setFillColor(sf::Color::White);
-    menuText.setStyle(sf::Text::Bold);
-    menuText.setPosition(0.f * SCREEN_SCALE_, 64.f * SCREEN_SCALE_);
+    game::text(menuText, textString, font, sf::Color::White, true, 20, 10.f, 64.f, SCREEN_SCALE_);
+
+    sf::Text enemyText;
+    game::text(enemyText, enemyString, font, sf::Color::White, false, 16, 42.f, 100.f, SCREEN_SCALE_);
 
     // Need to do this or textures break
     alien a1(alien::AlienType::SQUID,   SCREEN_SCALE_);
@@ -201,12 +232,13 @@ void game::menu(sf::RenderWindow& window, float SCREEN_SCALE_) {
         // (i == 0) ? a1 = a : (i == 1) ? a2 = a : a3 = a;
         a.loadTexture();
         a.setRScale(0);
-        a.setPosition(20.f * SCREEN_SCALE_, (100.f + 20.f * i) * SCREEN_SCALE_);
+        a.setPosition(20.f * SCREEN_SCALE_, (100.f + 24.f * i) * SCREEN_SCALE_);
         aliensL.push_back(a);
     }
 
     window.clear();
     window.draw(menuText);
+    window.draw(enemyText);
     for (int i = 0; i < 3; i++) {
         aliensL[i].render(window);
     }
@@ -221,7 +253,7 @@ void game::menu(sf::RenderWindow& window, float SCREEN_SCALE_) {
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
         game::start(window, SCREEN_SCALE_);
-        while (window.isOpen()) {
+        while (running) {
             game::update(window);
         }
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
@@ -229,22 +261,16 @@ void game::menu(sf::RenderWindow& window, float SCREEN_SCALE_) {
     }
 }
 
-void text(sf::RenderWindow& window, std::string text) {
-    sf::Font font;
-    if (!font.loadFromFile("assets/Code7X5.ttf")) {
-        std::cerr << "Error loading font" << std::endl;
-    }
+void game::text(sf::Text& textObject, std::string text, sf::Font& font, sf::Color color, 
+                bool bold, int size, float posX, float posY, int scale) {
+    textObject.setFont(font);
+    textObject.setString(text);
+    textObject.setCharacterSize(size);
+    textObject.setFillColor(color);
+    if (bold) textObject.setStyle(sf::Text::Bold);
+    textObject.setPosition(posX * scale, posY * scale);
+}
 
-    // Set font
-    sf::Text menuText;
-    menuText.setFont(font);
-    menuText.setString(text);
-    menuText.setCharacterSize(20); // in pixels, not points!
-    menuText.setFillColor(sf::Color::White);
-    menuText.setStyle(sf::Text::Bold);
-    menuText.setPosition(0.f * SCREEN_SCALE, 64.f * SCREEN_SCALE);
-
-    window.clear();
-    window.draw(menuText);
-    window.display();
+void game::pauseForSeconds(int seconds) {
+    std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }

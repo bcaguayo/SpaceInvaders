@@ -46,6 +46,10 @@ public:
         sprite.setColor(color);
     }
 
+    sf::FloatRect getBounds() {
+        return sprite.getGlobalBounds();
+    }
+
     void moveto(renderable& r, float x_offset, float y_offset) {
         float x = r.getPositionX() + x_offset;
         float y = r.getPositionY() + y_offset;
@@ -56,7 +60,7 @@ public:
         window.draw(sprite);
     }
 
-public:
+protected:
     virtual std::string getTexturePath() const = 0;
     sf::Texture texture;
     sf::Sprite sprite;
