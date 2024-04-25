@@ -38,6 +38,14 @@ public:
         sprite.setPosition(r.getPositionX(), r.getPositionY());
     }
 
+    void moveto(float x, float y) {
+        sprite.setPosition(x, y);
+    }
+
+    void color(sf::Color color) {
+        sprite.setColor(color);
+    }
+
     void moveto(renderable& r, float x_offset, float y_offset) {
         float x = r.getPositionX() + x_offset;
         float y = r.getPositionY() + y_offset;

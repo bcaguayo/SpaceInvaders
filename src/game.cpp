@@ -1,4 +1,6 @@
 #include <SFML/Graphics.hpp>
+#include <cstdlib> // rand() and srand()
+#include <ctime>   // time()
 #include <iostream>
 #include "game.hpp"
 #include "player.hpp"
@@ -20,11 +22,17 @@ std::vector<std::unique_ptr<alien>> aliens;
 std::vector<bool> alive;
 bool direction = true;
 int tick = 0;
+
+std::vector<missile> alienMissiles;
+
 /* ________________________ Methods ________________________ */
 
 void game::start(sf::RenderWindow& window, float scale) {
     // Window
     SCREEN_SCALE = scale;
+
+    // Seed the rng for alien missiles
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     // Player
     p = player(SCREEN_SCALE);
@@ -49,7 +57,7 @@ void game::update(sf::RenderWindow& window) {
     tick++;
     tick %= 60;
     
-    // 1. Poll
+    // ________________________ 1. Poll
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -61,7 +69,7 @@ void game::update(sf::RenderWindow& window) {
         window.close();
     }
 
-    // 2. Missiles
+    // ________________________ 2. Update Missiles
     for (int i = 0; i < missiles.size(); i++) {
         missiles[i].move(false);
         if (missiles[i].getPositionY() < 0.f || missiles[i].getPositionY() > 300.f * SCREEN_SCALE) {
@@ -69,7 +77,14 @@ void game::update(sf::RenderWindow& window) {
         }
     }
 
-    // Move Aliens
+    for (int i = 0; i < alienMissiles.size(); i++) {
+        alienMissiles[i].move(false);
+        if (alienMissiles[i].getPositionY() < 0.f || alienMissiles[i].getPositionY() > 300.f * SCREEN_SCALE) {
+            alienMissiles.erase(alienMissiles.begin() + i);
+        }
+    }
+
+    // ________________________ 3. Move Aliens
     if (tick == 0 || tick == 30) {
         int size = aliens.size();
         bool changeDirection = 0;
@@ -87,10 +102,23 @@ void game::update(sf::RenderWindow& window) {
             changeDirection = false;
         }
     } else if (tick == 1) {
+        // make enemy missile
+        missile m = missile(SCREEN_SCALE, 2.f);
 
+        // Generate a random index within the range of the vector size
+        size_t randomIndex = std::rand() % aliens.size();
+
+        // Access the random alien
+        auto& randomAlien = *(aliens[randomIndex]);
+
+        m.loadTexture();
+        m.setRScale();
+        m.color(sf::Color::White);
+        m.moveto(randomAlien.getPositionX(), randomAlien.getPositionY());
+        alienMissiles.push_back(m);
     }
     
-    // 3. Player
+    // ________________________ 4. Player
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && 
         p.getPositionX() > 10.f * SCREEN_SCALE) {
         p.move(false);
@@ -112,7 +140,7 @@ void game::update(sf::RenderWindow& window) {
         cooldown = 15;
     }
 
-    // 4. Draw
+    // 5. Draw
     game::draw(window);
 }
 
@@ -124,6 +152,9 @@ void game::draw(sf::RenderWindow& window) {
     }
     for (int i = 0; i < aliens.size(); ++i) {
         aliens[i]->render(window);
+    }
+    for (int i = 0; i < alienMissiles.size(); i++) {
+        alienMissiles[i].render(window);
     }
     window.display();
 }

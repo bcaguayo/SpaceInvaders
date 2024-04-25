@@ -26,7 +26,7 @@ public:
     }
 
     void move(bool _) override {
-        sprite.move(0.f, speed);
+        sprite.move(0.f, speed * SCREEN_SCALE);
     }
 
     float getSpeed() {
@@ -35,7 +35,7 @@ public:
 
 protected:
     std::string getTexturePath() const override { return "assets/default.png"; }
-    float speed = -12.f;
+    float speed = -3.f;
 };
 
 #endif // MISSILE_HPP
