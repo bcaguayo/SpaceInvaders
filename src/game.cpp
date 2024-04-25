@@ -86,7 +86,7 @@ void game::update(sf::RenderWindow& window) {
             std::cerr << "Error loading font" << std::endl;
         }
         sf::Text endText;      
-        game::text(endText, "GAME OVER :(", font, sf::Color::Red, true, 50, 50.f, 220.f, SCREEN_SCALE);
+        game::text(endText, "GAME OVER :(", font, sf::Color::Red, true, 50, 40.f, 120.f, SCREEN_SCALE);
         window.draw(endText);
         window.display();
         
@@ -99,7 +99,7 @@ void game::update(sf::RenderWindow& window) {
             std::cerr << "Error loading font" << std::endl;
         }
         sf::Text endText;      
-        game::text(endText, "YOU WIN! :D", font, sf::Color::Cyan, true, 50, 50.f, 220.f, SCREEN_SCALE);
+        game::text(endText, "YOU WIN! :D", font, sf::Color::Cyan, true, 50, 40.f, 120.f, SCREEN_SCALE);
         window.draw(endText);
         window.display();
         
