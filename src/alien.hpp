@@ -46,6 +46,10 @@ public:
         }
     }
 
+    void alt() {
+        alt_ = !alt_;
+    }
+
 public:
     AlienType type_;
     bool alt_;

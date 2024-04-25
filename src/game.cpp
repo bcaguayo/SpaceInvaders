@@ -12,13 +12,16 @@
 /* ________________________ Local Vars ________________________ */
 float SCREEN_SCALE;
 bool running = true;
+sf::Font font;
+int score;
+sf::Text scoreText;
 
 /* ________________________ Game Vars ________________________ */
 player p;
 int lives;
+sf::Text livesText;
 int cooldown;
 std::vector<missile> missiles;
-
 // vector of 55 bools, true if alive, false if dead
 // 0-10 = squid
 // 11-33 = crab
@@ -28,6 +31,7 @@ std::vector<std::unique_ptr<alien>> aliens;
 std::vector<bool> alive;
 int numAliens;
 bool direction = true;
+bool alt = false;
 int tick = 0;
 
 std::vector<missile> alienMissiles;
@@ -46,6 +50,7 @@ void game::start(sf::RenderWindow& window, float scale) {
     p.loadTexture();
     p.setRScale();
     lives = 3;
+    score = 0;
     
     // Aliens
     aliens.clear();
@@ -60,6 +65,13 @@ void game::start(sf::RenderWindow& window, float scale) {
         alive.push_back(true);
     }
     numAliens = 55;
+
+     // ________________________ 5. Score
+    if (!font.loadFromFile("assets/Code7X5.ttf")) {
+        std::cerr << "Error loading font" << std::endl;
+    }
+    game::text(livesText, "Lives: ", font, sf::Color::Green, true, 16, 20.f, 220.f, SCREEN_SCALE);
+    game::text(scoreText, "Score: ", font, sf::Color::Green, true, 16, 20.f, 230.f, SCREEN_SCALE);
 }
 
 void game::update(sf::RenderWindow& window) {
@@ -74,7 +86,7 @@ void game::update(sf::RenderWindow& window) {
             std::cerr << "Error loading font" << std::endl;
         }
         sf::Text endText;      
-        game::text(endText, "GAME OVER", font, sf::Color::Red, true, 50, 50.f, 220.f, SCREEN_SCALE);
+        game::text(endText, "GAME OVER :(", font, sf::Color::Red, true, 50, 50.f, 220.f, SCREEN_SCALE);
         window.draw(endText);
         window.display();
         
@@ -98,11 +110,13 @@ void game::update(sf::RenderWindow& window) {
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
+            running = false;
             window.close();
         } 
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
+        running = false;
         window.close();
     }
 
@@ -128,7 +142,6 @@ void game::update(sf::RenderWindow& window) {
         for (size_t i = 0; i < size; ++i) {
             auto& a = *(aliens[i]);
             a.move(direction);
-
             if (i == size - 11 && a.getPositionX() <= 11 * SCREEN_SCALE || 
                 i == size - 1 && a.getPositionX() >= 204 * SCREEN_SCALE) {
                 changeDirection = true;
@@ -144,10 +157,13 @@ void game::update(sf::RenderWindow& window) {
 
         // Generate a random index within the range of the vector size
         size_t randomIndex = std::rand() % aliens.size();
+        while (!alive[(int) randomIndex] && numAliens > 0) {
+            randomIndex++;
+            randomIndex %= aliens.size();
+        }
 
         // Access the random alien
         auto& randomAlien = *(aliens[randomIndex]);
-
         m.loadTexture();
         m.setRScale();
         m.color(sf::Color::White);
@@ -158,12 +174,24 @@ void game::update(sf::RenderWindow& window) {
     // Alien Collision
     for (int i = 0; i < missiles.size(); i++) {
         sf::FloatRect missileBounds = missiles[i].getBounds();
-        for (const auto& aPtr : aliens) {
-            auto& a = *aPtr;
-            if (missileBounds.intersects(a.getBounds())) {
+        for (size_t i = 0; i < aliens.size(); ++i) {
+            auto& a = *(aliens[i]);
+            if (alive[i] && missileBounds.intersects(a.getBounds())) {
                 missiles.erase(missiles.begin() + i);
-            }            
+                alive[i] = false;
+                numAliens--;
+
+                // Update score
+                score += (i < 11) ? 30 : (i < 33) ? 20 : 10;
+            }
         }
+
+        // for (const auto& aPtr : aliens) {
+        //     auto& a = *aPtr;
+        //     if (missileBounds.intersects(a.getBounds())) {
+        //         missiles.erase(missiles.begin() + i);
+        //     }            
+        // }
     }
     
     // ________________________ 4. Player
@@ -210,11 +238,24 @@ void game::draw(sf::RenderWindow& window) {
         missiles[i].render(window);
     }
     for (int i = 0; i < aliens.size(); ++i) {
-        aliens[i]->render(window);
+        if (alive[i]) {
+            aliens[i]->render(window);        
+        }
     }
     for (int i = 0; i < alienMissiles.size(); i++) {
         alienMissiles[i].render(window);
     }
+    
+    // On screen Text
+    sf::Text livesT;
+    game::text(livesT, std::to_string(lives), font, sf::Color::Green, true, 16, 60.f, 220.f, SCREEN_SCALE);
+    sf::Text scoreT;
+    game::text(scoreT, std::to_string(score), font, sf::Color::Green, true, 16, 60.f, 230.f, SCREEN_SCALE);
+    
+    window.draw(livesT);
+    window.draw(livesText);
+    window.draw(scoreT);
+    window.draw(scoreText);
     window.display();
 }
 
@@ -228,7 +269,7 @@ Press Q to quit the game
 Optional: Press L for leaderboards
 */
 std::string textString = "SPACE INVADERS\nPress Enter to play\nPress Q to quit the game";
-std::string enemyString = "= 10 points\n\n\n\n= 20 points\n\n\n\n= 30 points";
+std::string enemyString = "= 30 points\n\n\n\n= 20 points\n\n\n\n= 10 points";
 void game::menu(sf::RenderWindow& window, float SCREEN_SCALE_) {
     sf::Font font;
     if (!font.loadFromFile("assets/Code7X5.ttf")) {
