@@ -259,8 +259,6 @@ void game::draw(sf::RenderWindow& window) {
     window.display();
 }
 
-
-
 /*
 Render Instructions
 
