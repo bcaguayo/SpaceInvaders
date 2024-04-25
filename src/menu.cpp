@@ -23,7 +23,6 @@ int main() {
     // Game Start
     sf::RenderWindow window(sf::VideoMode(224.f * SCREEN_SCALE_, 256.f * SCREEN_SCALE_), "Space Invaders");
     game::start(window, SCREEN_SCALE_);
-    // window.setFramerateLimit(60);
     
     // Game Update
     while (window.isOpen()) {

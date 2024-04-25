@@ -2,41 +2,37 @@
 #include <iostream>
 #include "game.hpp"
 #include "player.hpp"
+#include "missile.hpp"
 
-float SCREEN_SCALE = 1.f;
-float TESTING_SPEED = 3.f;
-
+float SCREEN_SCALE = 3.f;
 player p;
-sf::RectangleShape missile;
+std::vector<missile> missiles;
+sf::RectangleShape missileRect;
 float missileSpeed;
 bool fired;
 
+
 void game::start(sf::RenderWindow& window, float scale) {
+    // Window
     SCREEN_SCALE = scale;
     window.setFramerateLimit(60);
+    window.setPosition(sf::Vector2i(600, 400));
 
     // Player
-    p = player();
-    p.loadTexture(SCREEN_SCALE);
+    p = player(SCREEN_SCALE);
+    p.loadTexture();
+    p.setRScale();
 
     // Missile
-    missile.setSize(sf::Vector2f(1.f * SCREEN_SCALE, 2.f * SCREEN_SCALE));
-    missile.setFillColor(sf::Color::Green);
+    missileRect.setSize(sf::Vector2f(1.f * SCREEN_SCALE, 2.f * SCREEN_SCALE));
+    missileRect.setFillColor(sf::Color::Green);
     missileSpeed = 12.f;
     fired = false;
 }
 
-
 void game::update(sf::RenderWindow& window) {
-    if (fired) {
-        missile.move(0.f, -missileSpeed);
-        if (missile.getPosition().y > 256.f * SCREEN_SCALE) {
-            // Hide missile
-            missile.setPosition(0.f, -100.f);
-            fired = false;
-        }
-    }
-
+    
+    // 1. Poll
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -48,24 +44,56 @@ void game::update(sf::RenderWindow& window) {
         window.close();
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && p.getPositionX() > 10.f * SCREEN_SCALE) {
-        p.move(-1.f * TESTING_SPEED, 0.f);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && p.getPositionX() < 204.f * SCREEN_SCALE) {
-        p.move(1.f * TESTING_SPEED, 0.f);
+    // 2. Missiles
+
+    if (fired) {
+        missileRect.move(0.f, -missileSpeed);
+        if (missileRect.getPosition().y > 256.f * SCREEN_SCALE) {
+            // Hide missile
+            missileRect.setPosition(0.f, -100.f);
+            fired = false;
+        }
+    }
+
+    for (int i = 0; i < missiles.size(); i++) {
+        missiles[i].move(false);
+        if (missiles[i].getPositionY() < 0.f || missiles[i].getPositionY() > 300.f * SCREEN_SCALE) {
+            missiles.erase(missiles.begin() + i);
+        }
+    }
+
+    // 3. Player
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && 
+        p.getPositionX() > 10.f * SCREEN_SCALE) {
+        p.move(false);
+    } else if ( sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && 
+                p.getPositionX() < 204.f * SCREEN_SCALE) {
+        p.move(true);
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-        // wip many missiles and missile cooldown
-        missile.setPosition(p.getPositionX() + 6.f * SCREEN_SCALE, 
-                            p.getPositionY() + 3.f * SCREEN_SCALE);
-        fired = true;
+        // wip missile cooldown
+        missile m = missile(SCREEN_SCALE);
+        m.loadTexture();
+        m.setRScale();
+        m.moveto(p, 6.f * SCREEN_SCALE, 0.f);
+        missiles.push_back(m);
     }
+
 
     window.clear();
     p.render(window);
-    window.draw(missile);
+    for (int i = 0; i < missiles.size(); i++) {
+        missiles[i].render(window);
+    }
+    // window.draw(missileRect);
     window.display();
 
+}
+
+void game::draw(sf::RenderWindow& window) {
+    // wip
 }
 
 /*
