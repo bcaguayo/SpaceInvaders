@@ -13,8 +13,9 @@ This is a C++ implementation of the classic Space Invaders arcade game. The goal
 
 ## Usage
 
-1. run from terminal
-2. play
+1. build with gcc
+2. run from terminal
+3. play
 
 ## Contributing
 
