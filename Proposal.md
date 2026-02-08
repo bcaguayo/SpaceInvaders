@@ -10,7 +10,7 @@ Access a Google Docs version (Comments enabled) [here](https://docs.google.com/d
 
 ## Overview
 
-This project aims to develop a C++ adaptation of the classic 1978 arcade game Space Invaders. It leverages C++'s memory management capabilities to create a robust and lightweight terminal-based experience that simulates the core mechanics of resource management, survival, and decision-making, capturing the essence of the original game.
+This project aims to develop a C++ adaptation of the classic 1978 arcade game Space Invaders. It leverages C++'s memory management capabilities to create a robust and lightweight terminal-based experience that simulates the core mechanics of resource management, survival, and decision-making, capturing the essence of the original game. 
 
 ## Features
 
